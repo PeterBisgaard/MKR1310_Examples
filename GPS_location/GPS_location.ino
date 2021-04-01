@@ -2,13 +2,16 @@
   GPS Location
   This sketch uses the GPS to determine the location of the board
   and prints it to the Serial monitor.
-  Circuit:
+  Circuit: 
    - MKR board
    - MKR GPS attached via I2C cable
   This example code is in the public domain.
 */
 
 #include <Arduino_MKRGPS.h>
+#include "GPS_statistic.h"
+
+GPS_statistic myGPSstat(1000);
 
 void setup() {
   // initialize serial communications and wait for port to open:
@@ -38,7 +41,11 @@ void loop() {
     float altitude   = GPS.altitude();
     float speed      = GPS.speed();
     int   satellites = GPS.satellites();
-
+    myGPSstat.addReading(satellites);
+    float avgSatelites = myGPSstat.avgSatelites();
+    unsigned int minSatelites = myGPSstat.minSatelites();
+    unsigned int maxSatelites = myGPSstat.maxSatelites();
+    
     // print GPS values
     Serial.print("Location: ");
     Serial.print(latitude, 7);
@@ -52,9 +59,15 @@ void loop() {
     Serial.println(" km/h");
     Serial.print("Number of satellites: ");
     Serial.println(satellites);
+    
+    Serial.print("Satellites statistic: ");
+    char s[16];
+    sprintf(s, "min: %u, max: %u, avg: ", minSatelites, maxSatelites);
+    Serial.print(s);
+    Serial.println(avgSatelites);
     Serial.println();
   }
-//  else
+// else
 //  {
 //    Serial.println("No GPS available");
 //    delay(2000);
